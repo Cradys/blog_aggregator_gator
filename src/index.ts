@@ -1,7 +1,10 @@
 import { readConfig, setUser } from "./config";
+import { CommandsRegistry, registerCommand,  runCommand, handlerLogin } from "./commands_handler";
 
 function main() {
-  console.log(setUser("Bob"))
+  let registry: CommandsRegistry = {}
+
+  registerCommand(registry, "login", handlerLogin)
 }
 
 main();
