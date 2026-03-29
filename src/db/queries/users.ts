@@ -7,14 +7,16 @@ export async function createUser(name: string) {
   return result;
 }
 
-export async function getUser(name: string) {
-  const [result] = await db
-  .select({name: users.name})
-  .from(users)
-  .limit(1)
-  .where(eq(users.name, name))
-
-  return result
+export async function getUsers(name?: string) {
+  if (name) {
+    return await db
+      .select({name: users.name})
+      .from(users)
+      .where(eq(users.name, name))
+  }
+  return await db
+    .select({name: users.name})
+    .from(users)
 }
 
 export async function deleteUsers() {

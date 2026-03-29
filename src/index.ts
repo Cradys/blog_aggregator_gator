@@ -1,5 +1,5 @@
 import { argv } from "node:process"
-import { login, register, reset } from "./command_handlers";
+import { login, register, reset, users } from "./command_handlers";
 import { CommandsRegistry, registerCommand,  runCommand } from "./commands_handler";
 
 async function  main() {
@@ -15,7 +15,8 @@ async function  main() {
   registerCommand(registry, "login", login)
   registerCommand(registry, "register", register)
   registerCommand(registry, "reset", reset)
-  
+  registerCommand(registry, "users", users)
+
   const command = args[0]
   const argument = args.slice(1)
 
