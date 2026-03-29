@@ -1,8 +1,8 @@
 import { argv } from "node:process"
-import { handlerLogin } from "./command_handlers";
+import { login, register, reset } from "./command_handlers";
 import { CommandsRegistry, registerCommand,  runCommand } from "./commands_handler";
 
-function main() {
+async function  main() {
   
 
   const args = argv.slice(2)
@@ -12,12 +12,16 @@ function main() {
   }
   let registry: CommandsRegistry = {}
 
-  registerCommand(registry, "login", handlerLogin)
-
+  registerCommand(registry, "login", login)
+  registerCommand(registry, "register", register)
+  registerCommand(registry, "reset", reset)
+  
   const command = args[0]
   const argument = args.slice(1)
 
-  runCommand(registry ,command, ...argument)
+  await runCommand(registry ,command, ...argument)
+
+  process.exit(0)
 }
 
 main();
