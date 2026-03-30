@@ -1,5 +1,6 @@
 import { readConfig, setUser } from "./config";
 import { getUsers, createUser, deleteUsers } from "./db/queries/users";
+import { fetchRSSFeed } from "./RSSFeed";
 
 
 export async function login(cmdName: string, ...args: string[]) {
@@ -46,6 +47,7 @@ export async function reset() {
   return
 }
 
+
 export async function users() {
   const users = await getUsers()
   const currentUser = readConfig().currentUserName
@@ -53,4 +55,12 @@ export async function users() {
   for (let user of users) {
     console.log(`* ${user.name}${user.name === currentUser? " (current)": ""}`)
   }
+}
+
+
+export async function agg() {
+  const url = 'https://www.wagslane.dev/index.xml'
+  const response =await fetchRSSFeed(url)
+
+  console.log(JSON.stringify(response, null, 2))
 }
