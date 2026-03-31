@@ -1,5 +1,5 @@
 import { readConfig, setUser } from "./config";
-import { getUsers, createUser, deleteUsers } from "./db/queries/users";
+import { getUsers, getUser, createUser, deleteUsers } from "./db/queries/users";
 import { fetchRSSFeed } from "./RSSFeed";
 
 
@@ -8,7 +8,7 @@ export async function login(cmdName: string, ...args: string[]) {
     throw new Error(`The login handler expects a single argument, the username.\n Usage: ${cmdName} <name>\n`)
   }
   const [username] = args
-  const [foundUser] = await getUsers(username)
+  const foundUser = await getUser(username)
 
   if (!foundUser) {
     throw new Error(`You can't login to an account that doesn't exist!`)
@@ -25,7 +25,7 @@ export async function register(cmdName: string, ...args: string[]) {
   }
   
   const [username] = args
-  const [foundUser] = await getUsers(username)
+  const foundUser = await getUser(username)
    
   if (foundUser) {
     throw new Error(`User already exists`)
@@ -60,7 +60,9 @@ export async function users() {
 
 export async function agg() {
   const url = 'https://www.wagslane.dev/index.xml'
-  const response =await fetchRSSFeed(url)
+  const response = await fetchRSSFeed(url)
 
   console.log(JSON.stringify(response, null, 2))
 }
+
+
