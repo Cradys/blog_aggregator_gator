@@ -1,5 +1,5 @@
 import { db } from "..";
-import { users } from "../schema";
+import { users, feeds } from "../schema";
 import { eq } from "drizzle-orm";
 
 export async function createUser(name: string) {
@@ -20,5 +20,6 @@ export async function getUsers(name?: string) {
 }
 
 export async function deleteUsers() {
+  await db.delete(feeds)
   await db.delete(users)
 }
