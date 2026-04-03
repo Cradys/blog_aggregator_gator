@@ -1,15 +1,16 @@
 import { Feed, User } from "./db/schema"
-import { createFeed, getFeeds, GetFeeds } from "./db/queries/feeds"
-import { getUser } from "./db/queries/users"
+import { createFeed, getFeeds } from "./db/queries/feeds"
+import { getUser, getUserById } from "./db/queries/users"
 import { readConfig } from "./config"
 
 
 export async function addFeed(cmdName: string, ...args: string[]) {
+  if (args.length !== 2) {
+    throw new Error('Can not add function, something missing: addfeed <name> <url>')
+  }
   const name = args[0]
   const url = args[1]
-  if (!name || !url) {
-    throw new Error('Not enough data for create feed: addfeed <name> <url>')
-  }
+  
   const currentUser = readConfig().currentUserName
 
   const user = await getUser(currentUser)
@@ -20,13 +21,26 @@ export async function addFeed(cmdName: string, ...args: string[]) {
 }
 
 export async function listFeeds() {
-  const result = await getFeeds()
-  if (result.length === 0) {
+  const feeds = await getFeeds()
+
+  if (feeds.length === 0) {
     console.log(`No feeds found.`);
     return;
   }
-  console.log(`Found %d feeds:\n`, result.length);
-  printFeeds(result)
+
+  console.log(`Found %d feeds:\n`, feeds.length);
+
+  for (let feed of feeds) {
+    const user = await getUserById(feed.userId)
+
+    if (!user) {
+      throw new Error(`Failed to find user for feed ${feed.id}`);
+    }
+
+    printFeed(feed, user)
+    console.log(`=====================================`)
+  }
+  
 }
 
 function printFeed(feed: Feed, user: User) {
@@ -38,11 +52,3 @@ function printFeed(feed: Feed, user: User) {
   console.log(`* User:          ${user.name}`);
 }
 
-function printFeeds(feeds: GetFeeds) {
-  feeds.forEach((feed) => {
-    console.log(`* Name:          ${feed.name}`);
-    console.log(`* URL:           ${feed.url}`);
-    console.log(`* User:          ${feed.username}`);
-    console.log(`=====================================`)
-  })
-}
