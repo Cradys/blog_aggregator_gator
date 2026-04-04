@@ -1,27 +1,26 @@
 import { Feed, User } from "./db/schema"
 import { createFeed, getFeeds } from "./db/queries/feeds"
 import { getUser, getUserById } from "./db/queries/users"
+import { createFeedFollow } from "./db/queries/feed_follow"
 import { readConfig } from "./config"
 
 
-export async function addFeed(cmdName: string, ...args: string[]) {
+export async function addFeed(cmdName: string, user: User, ...args: string[]) {
   if (args.length !== 2) {
     throw new Error('Can not add function, something missing: addfeed <name> <url>')
   }
   const name = args[0]
   const url = args[1]
+
+  const feed = await createFeed(name, url, user.id)
   
-  const currentUser = readConfig().currentUserName
-
-  const user = await getUser(currentUser)
-
-  const feed = await createFeed(name, url, currentUser)
+  await createFeedFollow(user.id, feed.id)
   
   printFeed(feed, user)
 }
 
 export async function listFeeds() {
-  const feeds = await getFeeds()
+  const feeds = await getFeeds() 
 
   if (feeds.length === 0) {
     console.log(`No feeds found.`);

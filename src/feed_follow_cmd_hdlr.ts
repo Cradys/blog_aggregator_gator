@@ -1,17 +1,15 @@
 import { Feed, FeedFollows, User } from "./db/schema"
-import { getFeedByURL } from "./db/queries/feeds"
+import { getFeedByURL, getFeedById } from "./db/queries/feeds"
 import { getUserByName } from "./db/queries/users"
 import { readConfig } from "./config"
-import { createFeedFollow } from "./db/queries/feed_follow"
+import { createFeedFollow, listFeedFollowsByUserId } from "./db/queries/feed_follow"
 
-export async function follow(cmdName: string, ...args: string[]) {
+export async function follow(cmdName: string, user: User, ...args: string[]) {
   if (args.length < 1) {
     throw new Error(`Must be 1 argument: follow <feed url>`)
   }
 
   const feedURL = args[0]
-  const username = readConfig().currentUserName
-
   const feed = await getFeedByURL(feedURL)
 
   if (!feed) {
@@ -19,15 +17,27 @@ export async function follow(cmdName: string, ...args: string[]) {
     return
   }
 
-  const user = await getUserByName(username)
-
-  if (!user) {
-    throw new Error(`User ${username} not found`)
-  }
-
   const feedFollow = await createFeedFollow(user.id, feed.id)
 
   printFeedFollow(feed, user, feedFollow)
+}
+
+export async function getFeedFollowsForUser(cmdName: string, user: User, ...args: string[]) {
+
+  const feedFollows = await listFeedFollowsByUserId(user.id)
+
+  if (feedFollows.length === 0) {
+    console.log("Any feed isn`t followed by user")
+  }
+
+  console.log(`User ${user.name} followe ${feedFollows.length}`)
+
+  for (let feedFollow of feedFollows) {
+    const feed = await getFeedById(feedFollow.feedId)
+
+    printFeedFollow(feed, user, feedFollow)
+    console.log("======================================")
+  }
 }
 
 function printFeedFollow(feed: Feed, user: User, feedFollow: FeedFollows) {

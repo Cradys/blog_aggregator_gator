@@ -3,6 +3,7 @@ import { getUsers, getUser, createUser, deleteUsers } from "./db/queries/users";
 import { fetchRSSFeed } from "./RSSFeed";
 
 
+
 export async function login(cmdName: string, ...args: string[]) {
   if (args.length !== 1) {
     throw new Error(`The login handler expects a single argument, the username.\n Usage: ${cmdName} <name>\n`)
@@ -35,7 +36,6 @@ export async function register(cmdName: string, ...args: string[]) {
     const result = await createUser(username)
     setUser(username)
     console.log(`User ${username} was created`)
-    // console.log(result)
   } catch (err) {
     throw new Error((err as Error).message)
   }
