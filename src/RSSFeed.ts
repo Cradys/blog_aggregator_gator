@@ -15,7 +15,12 @@ export async function fetchRSSFeed(feedURL: string): Promise<RSSFeed> {
     }
 
     const xml = await response.text()
-    const parser = new XMLParser()
+    const parser = new XMLParser({
+      processEntities: {
+        enabled: true,
+        maxTotalExpansions: 5000
+      }
+    })
     const result = parser.parse(xml, true)
 
     const channel = result.rss?.channel

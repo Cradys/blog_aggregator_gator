@@ -33,24 +33,39 @@ export async function agg(cmdName:string, ...args: string[]) {
       throw new Error(`Time measure does not match: ms, s, m, h`)
   }
   
+  console.log(`Collecting feeds every ${time}${measure}`)
 
-  const url = 'https://www.wagslane.dev/index.xml'
-  const response = await fetchRSSFeed(url)
+  await scrapeFeeds().catch(handleError)
 
-  
-  console.log(JSON.stringify(response, null, 2))
+  const interval = setInterval(() => {
+    scrapeFeeds().catch(handleError)
+  }, timeBetweenReqs);
+
+  await new Promise<void>((resolve) => {
+    process.on("SIGINT", () => {
+      console.log("Shutting down feed aggregator...");
+      clearInterval(interval);
+      resolve();
+    });
+  });
 }
 
 
 export async function scrapeFeeds() {
   const [feed] = await getNextFeedToFetch()
   await markFeedFetched(feed.id)
+
+  console.log(`${feed.name} ${feed.url}`)
+
   const fetchedFeeds = await fetchRSSFeed(feed.url)
 
-  for (let feed of fetchedFeeds.channel.items) {
-    console.log(`Title *   ${feed.title}`)
-    console.log(`=======================`)
-  }
+  
+  console.log(`Total: ${fetchedFeeds.channel.items.length}`)
+
+  // for (let feed of fetchedFeeds.channel.items) {
+  //   console.log(`Title *   ${feed.title}`)
+  //   console.log(`=======================`)
+  // }
 }
 
 
@@ -58,4 +73,9 @@ function parseDuration(durationStr: string) {
   const regex = /^(\d+)(ms|s|m|h)$/;
   const match = durationStr.match(regex);
   return match
+}
+
+function handleError(error: Error) {
+  console.log(`Something went wrong - ${error.message}`)
+  return Promise.resolve
 }
