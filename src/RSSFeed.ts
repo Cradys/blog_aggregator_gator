@@ -1,10 +1,7 @@
 import { XMLParser } from "fast-xml-parser"
-import { channel } from "node:diagnostics_channel"
-import { text } from "node:stream/consumers";
-import test from "node:test";
 
 
-export async function fetchRSSFeed(feedURL: string) {
+export async function fetchRSSFeed(feedURL: string): Promise<RSSFeed> {
   
   try {
     const response = await fetch(feedURL, {
@@ -26,9 +23,6 @@ export async function fetchRSSFeed(feedURL: string) {
       throw new Error('no channel in RSS feed')
     }
 
-    let items: any[] = []
-    let validItems: RSSItem[] = []
-    
     if (
       !channel.title ||
       !channel.link ||
@@ -38,11 +32,11 @@ export async function fetchRSSFeed(feedURL: string) {
       throw new Error('One of the required fields is missing from the channel')
     }
 
-    if (Array.isArray(channel.item)) {
-      items = channel.item
-    } else {
-      items.push(channel.item)
-    }
+    let items: any[] = Array.isArray(channel.item)
+    ? channel.item
+    : [channel.item];
+
+    let validItems: RSSItem[] = []
 
     for (let item of items) {
       if (
@@ -50,10 +44,10 @@ export async function fetchRSSFeed(feedURL: string) {
         !item.link || typeof item.link !== "string" ||
         !item.description || typeof item.description !== "string" ||
         !item.pubDate || typeof item.pubDate !== "string"
-
       ) {
         continue
       }
+
       validItems.push({
         title: item.title,
         link: item.link,
@@ -67,7 +61,7 @@ export async function fetchRSSFeed(feedURL: string) {
         title: channel.title,
         link: channel.link,
         description: channel.description,
-        item: validItems
+        items: validItems
       }
     }
 
@@ -77,6 +71,7 @@ export async function fetchRSSFeed(feedURL: string) {
     if (err instanceof Error) {
       throw new Error(`${err.message}`)
     }
+    throw new Error('Unknown error occurred')
   }
 }
 
@@ -86,7 +81,7 @@ type RSSFeed = {
     title: string;
     link: string;
     description: string;
-    item: RSSItem[];
+    items: RSSItem[];
   };
 };
 

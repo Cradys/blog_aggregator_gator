@@ -1,12 +1,10 @@
-import { Feed, FeedFollows, User } from "./db/schema"
-import { getFeedByURL, getFeedById } from "./db/queries/feeds"
-import { getUserByName } from "./db/queries/users"
-import { readConfig } from "./config"
-import { createFeedFollow, listFeedFollowsByUserId } from "./db/queries/feed_follow"
+import { Feed, FeedFollows, User } from "../db/schema"
+import { getFeedByURL, getFeedById } from "../db/queries/feeds"
+import { createFeedFollow, listFeedFollowsByUserId , deleteFeedFollowByUserId} from "../db/queries/feed_follow"
 
 export async function follow(cmdName: string, user: User, ...args: string[]) {
   if (args.length < 1) {
-    throw new Error(`Must be 1 argument: follow <feed url>`)
+    throw new Error(`Must be 1 argument: ${cmdName} <feed url>`)
   }
 
   const feedURL = args[0]
@@ -38,6 +36,23 @@ export async function getFeedFollowsForUser(cmdName: string, user: User, ...args
     printFeedFollow(feed, user, feedFollow)
     console.log("======================================")
   }
+}
+
+export async function unfollow(cmdName: string, user: User, ...args: string[]) {
+  if (args.length < 1) {
+    throw new Error(`Must be 1 argument: ${cmdName} <feed url>`)
+  }
+  
+  const feedURL = args[0]
+  const feed = await getFeedByURL(feedURL)
+
+
+  if (!feed) {
+    console.log(`Feed not found by url ${feedURL}`)
+    return
+  }
+
+  await deleteFeedFollowByUserId(user.id, feed.id)
 }
 
 function printFeedFollow(feed: Feed, user: User, feedFollow: FeedFollows) {

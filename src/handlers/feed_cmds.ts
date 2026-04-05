@@ -1,11 +1,10 @@
-import { Feed, User } from "./db/schema"
-import { createFeed, getFeeds } from "./db/queries/feeds"
-import { getUser, getUserById } from "./db/queries/users"
-import { createFeedFollow } from "./db/queries/feed_follow"
-import { readConfig } from "./config"
+import { Feed, User } from "../db/schema"
+import { createFeed, getFeeds } from "../db/queries/feeds"
+import { getUserById } from "../db/queries/users"
+import { createFeedFollow } from "../db/queries/feed_follow"
 
 
-export async function addFeed(cmdName: string, user: User, ...args: string[]) {
+export async function addFeed(_: string, user: User, ...args: string[]) {
   if (args.length !== 2) {
     throw new Error('Can not add function, something missing: addfeed <name> <url>')
   }

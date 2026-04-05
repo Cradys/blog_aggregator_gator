@@ -1,7 +1,5 @@
-import { readConfig, setUser } from "./config";
-import { getUsers, getUser, createUser, deleteUsers } from "./db/queries/users";
-import { fetchRSSFeed } from "./RSSFeed";
-
+import { readConfig, setUser } from "../config";
+import { getUsers, getUser, createUser, deleteUsers } from "../db/queries/users";
 
 
 export async function login(cmdName: string, ...args: string[]) {
@@ -56,13 +54,4 @@ export async function users() {
     console.log(`* ${user.name}${user.name === currentUser? " (current)": ""}`)
   }
 }
-
-
-export async function agg() {
-  const url = 'https://www.wagslane.dev/index.xml'
-  const response = await fetchRSSFeed(url)
-
-  console.log(JSON.stringify(response, null, 2))
-}
-
 

@@ -1,8 +1,9 @@
 import { argv } from "node:process"
-import { login, register, reset, users, agg } from "./user_cmd_hdlr";
-import { addFeed, listFeeds} from "./feed_cmd_hdlr";
-import { follow, getFeedFollowsForUser } from "./feed_follow_cmd_hdlr";
+import { login, register, reset, users} from "./handlers/user_cmds";
+import { addFeed, listFeeds} from "./handlers/feed_cmds";
+import { follow, getFeedFollowsForUser, unfollow } from "./handlers/feed_follow_cmds";
 import { CommandsRegistry, registerCommand,  runCommand } from "./commands_hdlr";
+import { agg } from "./handlers/aggregate_cmds";
 import { middlewareLoggedIn } from "./middleware";
 
 async function  main() {
@@ -24,6 +25,7 @@ async function  main() {
   registerCommand(registry, "feeds", listFeeds)
   registerCommand(registry, "follow", middlewareLoggedIn(follow))
   registerCommand(registry, "following", middlewareLoggedIn(getFeedFollowsForUser))
+  registerCommand(registry, "unfollow", middlewareLoggedIn(unfollow))
 
   const command = args[0]
   const argument = args.slice(1)
