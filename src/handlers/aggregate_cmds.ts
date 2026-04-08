@@ -1,5 +1,7 @@
+import { date } from "drizzle-orm/pg-core";
 import { fetchRSSFeed } from "../RSSFeed";
 import { getNextFeedToFetch, markFeedFetched } from "src/db/queries/feeds";
+import { createPost } from "src/db/queries/posts";
 
 
 export async function agg(cmdName:string, ...args: string[]) {
@@ -62,10 +64,19 @@ export async function scrapeFeeds() {
   
   console.log(`Total: ${fetchedFeeds.channel.items.length}`)
 
-  // for (let feed of fetchedFeeds.channel.items) {
-  //   console.log(`Title *   ${feed.title}`)
-  //   console.log(`=======================`)
-  // }
+  
+
+  for (let post of fetchedFeeds.channel.items) {
+    await createPost(
+      post.title,
+      post.link,
+      post.description,
+      post.pubDate,
+      feed.id
+    )
+    // console.log(`Title *   ${feed.title}`)
+    // console.log(`=======================`)
+  }
 }
 
 

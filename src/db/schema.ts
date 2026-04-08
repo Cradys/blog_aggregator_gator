@@ -45,8 +45,8 @@ export const posts = pgTable("posts", {
   title: text("title").notNull(),
   url: text("url").notNull().unique(),
   description: text("description"),
-  published_at: timestamp("published_at").notNull(),
-  feed_id: uuid("feed_id").references(() => feeds.id, { onDelete: "cascade" }).notNull()
+  publishedAt: timestamp("published_at").notNull(),
+  feedId: uuid("feed_id").references(() => feeds.id, { onDelete: "cascade" }).notNull()
 })
 
 export type Posts = typeof posts.$inferSelect
