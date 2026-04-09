@@ -1,4 +1,4 @@
-# Gator
+# gator
 
 ## Command Usage
 
@@ -16,3 +16,5 @@
 
 ### Post Commands
 - `browse [limit]`: Browse the latest posts from subscribed feeds, with an optional limit on the number of posts displayed, the default limit is 2.
+
+gator
